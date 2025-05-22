@@ -67,7 +67,7 @@ RUN apt update \
     /tmp/* \
     /var/tmp/*
 
-ENV QBITTORRENT_RELEASE=5.0.5
+ENV QBITTORRENT_RELEASE=4.6.7
 
 # Compile and install qBittorrent
 RUN apt update \
@@ -81,6 +81,7 @@ RUN apt update \
     libssl-dev \
     pkg-config \
     qtbase5-dev \
+    qtbase5-private-dev \
     qttools5-dev \
     zlib1g-dev \
     # && QBITTORRENT_RELEASE=$(curl -sX GET "https://api.github.com/repos/qBittorrent/qBittorrent/tags" | jq '.[] | select(.name | index ("alpha") | not) | select(.name | index ("beta") | not) | select(.name | index ("rc") | not) | .name' | head -n 1 | tr -d '"') \
@@ -102,6 +103,7 @@ RUN apt update \
     libssl-dev \
     pkg-config \
     qtbase5-dev \
+    qtbase5-private-dev \
     qttools5-dev \
     zlib1g-dev \
     && apt-get clean \
@@ -125,7 +127,7 @@ RUN echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.li
     libqt5network5 \
     libqt5xml5 \
     libqt5sql5 \
-    libssl1.1 \
+    libssl-dev \
     moreutils \
     net-tools \
     openresolv \
@@ -140,21 +142,12 @@ RUN echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.li
     /var/tmp/*
 
 # Install (un)compressing tools like unrar, 7z, unzip and zip
-RUN echo "deb http://deb.debian.org/debian/ bookworm non-free" > /etc/apt/sources.list.d/non-free-unrar.list \
-    && printf 'Package: *\nPin: release a=non-free\nPin-Priority: 150\n' > /etc/apt/preferences.d/limit-non-free \
-    && apt update \
-    && apt -y upgrade \
-    && apt -y install --no-install-recommends \
-    unrar \
+RUN apt update \
+    && apt install -y --no-install-recommends \
+    unrar-free \
     p7zip-full \
     unzip \
-    zip \
-    && apt-get clean \
-    && apt --purge autoremove -y \
-    && rm -rf \
-    /var/lib/apt/lists/* \
-    /tmp/* \
-    /var/tmp/*
+    zip
 
 # Remove src_valid_mark from wg-quick
 RUN sed -i /net\.ipv4\.conf\.all\.src_valid_mark/d `which wg-quick`
